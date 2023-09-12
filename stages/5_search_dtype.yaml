@@ -1,0 +1,22 @@
+name: 5 - search dtype
+workspace: ml-at-scale
+project: inference
+entrypoint: pip install transformers && python3 5_search_dtype.py
+environment:
+  environment_variables:
+  - TRANSFORMERS_CACHE=/run/determined/workdir/shared_fs/hfcache
+  - HF_MODULES_CACHE=/run/determined/workdir/shared_fs/hfcache
+resources:
+  slots_per_trial: 1
+max_restarts: 0
+hyperparameters:
+  dtype:
+    type: categorical
+    vals: 
+    - float32
+    - float16
+    - bfloat16
+searcher:
+  name: grid
+  metric: throughput
+  max_length: 1

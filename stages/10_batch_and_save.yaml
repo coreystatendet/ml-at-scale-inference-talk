@@ -1,0 +1,32 @@
+name: 10 - batch and save
+workspace: ml-at-scale
+project: inference
+entrypoint: pip install accelerate sentencepiece setuptools==59.5.0 transformers && python3 -m determined.launch.deepspeed python3 10_batch_and_save.py
+environment:
+  environment_variables:
+  - TRANSFORMERS_CACHE=/run/determined/workdir/shared_fs/hfcache
+  - HF_MODULES_CACHE=/run/determined/workdir/shared_fs/hfcache
+  image:
+    cuda: determinedai/environments:cuda-11.3-pytorch-1.10-deepspeed-0.8.3-gpu-0.24.0
+resources:
+  slots_per_trial: 4
+max_restarts: 0
+hyperparameters:
+  dtype: float16
+  per_process_batch_size: 2
+  model_name:
+    type: categorical
+    vals:
+    - openlm-research/open_llama_3b
+    - openlm-research/open_llama_7b
+    - openlm-research/open_llama_13b
+  deepspeed_inference_args:
+    mp_size: 4
+    dtype: float16
+    replace_with_kernel_inject: true
+    max_out_tokens: 32  
+
+searcher:
+  name: grid
+  metric: throughput
+  max_length: 1

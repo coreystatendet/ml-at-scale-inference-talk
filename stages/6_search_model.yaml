@@ -1,0 +1,29 @@
+name: 6 - search model
+workspace: ml-at-scale
+project: inference
+entrypoint: pip install accelerate sentencepiece transformers && python3 6_search_model.py
+environment:
+  environment_variables:
+  - TRANSFORMERS_CACHE=/run/determined/workdir/shared_fs/hfcache
+  - HF_MODULES_CACHE=/run/determined/workdir/shared_fs/hfcache
+resources:
+  slots_per_trial: 1
+max_restarts: 0
+hyperparameters:
+  dtype: float16
+  batch_size:
+    type: categorical
+    vals:
+    - 1
+    - 16
+  model_name:
+    type: categorical
+    vals:
+    - gpt2
+    - openlm-research/open_llama_3b
+    - openlm-research/open_llama_7b
+    - openlm-research/open_llama_13b
+searcher:
+  name: grid
+  metric: throughput
+  max_length: 1

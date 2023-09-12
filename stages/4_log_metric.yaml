@@ -1,0 +1,15 @@
+name: 4 - log metric
+workspace: ml-at-scale
+project: inference
+entrypoint: pip install transformers && python3 4_log_metric.py
+environment:
+  environment_variables:
+  - TRANSFORMERS_CACHE=/run/determined/workdir/shared_fs/hfcache
+  - HF_MODULES_CACHE=/run/determined/workdir/shared_fs/hfcache
+resources:
+  slots_per_trial: 1
+max_restarts: 0
+searcher:
+  name: single
+  metric: na
+  max_length: 1

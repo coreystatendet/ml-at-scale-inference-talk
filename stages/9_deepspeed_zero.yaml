@@ -1,0 +1,40 @@
+name: 9 - deepspeed zero
+workspace: ml-at-scale
+project: inference
+entrypoint: pip install accelerate sentencepiece setuptools==59.5.0 transformers==4.29.2 && python3 -m determined.launch.deepspeed python3 9_deepspeed_zero.py
+environment:
+  environment_variables:
+  - TRANSFORMERS_CACHE=/run/determined/workdir/shared_fs/hfcache
+  - HF_MODULES_CACHE=/run/determined/workdir/shared_fs/hfcache
+  image:
+    cuda: determinedai/environments:cuda-11.3-pytorch-1.10-deepspeed-0.8.3-gpu-0.24.0
+resources:
+  slots_per_trial: 1
+max_restarts: 0
+hyperparameters:
+  dtype: float16
+  batch_size:
+    type: categorical
+    vals:
+    - 1
+    - 16
+  model_name:
+    type: categorical
+    vals:
+    - gpt2
+    - openlm-research/open_llama_3b
+    - openlm-research/open_llama_7b
+    - openlm-research/open_llama_13b
+  deepspeed_config:
+    fp16:
+      enabled: true      
+    zero_optimization:
+      stage: 3
+      offload_param:
+        device: cpu
+        pin_memory: true      
+    train_micro_batch_size_per_gpu: 1  
+searcher:
+  name: grid
+  metric: throughput
+  max_length: 1

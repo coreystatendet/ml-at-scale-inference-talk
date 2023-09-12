@@ -1,0 +1,24 @@
+name: 7 - search model multigpu
+workspace: ml-at-scale
+project: inference
+entrypoint: pip install accelerate sentencepiece transformers && python3 7_search_model_multigpu.py
+environment:
+  environment_variables:
+  - TRANSFORMERS_CACHE=/run/determined/workdir/shared_fs/hfcache
+  - HF_MODULES_CACHE=/run/determined/workdir/shared_fs/hfcache
+resources:
+  slots_per_trial: 4
+max_restarts: 0
+hyperparameters:
+  dtype: float16
+  model_name:
+    type: categorical
+    vals:
+    - gpt2
+    - openlm-research/open_llama_3b
+    - openlm-research/open_llama_7b
+    - openlm-research/open_llama_13b
+searcher:
+  name: grid
+  metric: throughput
+  max_length: 1

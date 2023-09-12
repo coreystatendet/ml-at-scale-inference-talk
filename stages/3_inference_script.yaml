@@ -1,0 +1,19 @@
+name: 3 - inference script
+workspace: ml-at-scale
+project: inference
+entrypoint: pip install transformers && python3 3_inference_script.py
+environment:
+  environment_variables:
+  - TRANSFORMERS_CACHE=/run/determined/workdir/shared_fs/hfcache
+  - HF_MODULES_CACHE=/run/determined/workdir/shared_fs/hfcache
+resources:
+  slots_per_trial: 1
+# max_restarts defaults to 3, which is useful for recovering from intermittent failures, but
+# annoying when developing / debugging.
+max_restarts: 0
+# Searcher specifies the hyperparameter search algorithm, if any.
+# Unfortunately, it's currently required even if only running a single trial.
+searcher:
+  name: single
+  metric: na
+  max_length: 1
